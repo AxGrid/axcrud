@@ -19,6 +19,7 @@ type Repo[T any, ID IDConstraint] interface {
 	DeleteMany(ctx context.Context, ids []ID) (affected int64, err error)
 	// Транзакции опционально
 	WithTx(tx *gorm.DB) Repo[T, ID]
+	GetMany(context.Context, []ID) ([]T, error)
 }
 
 type Filter struct {

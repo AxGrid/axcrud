@@ -8,14 +8,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//type Repo[T any, ID IDConstraint] interface {
+//	GetList(context.Context, ListParams) ([]T, int64, error)
+//	GetOne(context.Context, ID) (T, error)
+//	GetMany(context.Context, []ID) ([]T, error)
+//	Create(context.Context, *T) error
+//	Update(context.Context, ID, map[string]any) (T, error)
+//	Delete(context.Context, ID) error
+//	DeleteMany(context.Context, []ID) (int64, error)
+//}
+
 type Repo[T any, ID IDConstraint] interface {
-	GetList(context.Context, ListParams) ([]T, int64, error)
-	GetOne(context.Context, ID) (T, error)
+	GetList(ctx context.Context, p ListParams) (items []T, total int64, err error)
+	GetOne(ctx context.Context, id ID) (T, error)
+	Create(ctx context.Context, in *T) error
+	Update(ctx context.Context, id ID, patch map[string]any) (T, error)
+	Delete(ctx context.Context, id ID) error
+	DeleteMany(ctx context.Context, ids []ID) (affected int64, err error)
 	GetMany(context.Context, []ID) ([]T, error)
-	Create(context.Context, *T) error
-	Update(context.Context, ID, map[string]any) (T, error)
-	Delete(context.Context, ID) error
-	DeleteMany(context.Context, []ID) (int64, error)
 }
 
 func GinGetList[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {

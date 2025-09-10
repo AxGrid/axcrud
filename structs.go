@@ -6,7 +6,11 @@ import (
 	"gorm.io/gorm"
 )
 
-type Repo[T any, ID comparable] interface {
+type IDConstraint interface {
+	~uint | ~uint64 | ~int | ~int64 | ~string
+}
+
+type Repo[T any, ID IDConstraint] interface {
 	GetList(ctx context.Context, p ListParams) (items []T, total int64, err error)
 	GetOne(ctx context.Context, id ID) (T, error)
 	Create(ctx context.Context, in *T) error

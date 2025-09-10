@@ -41,7 +41,7 @@ type RepoConfig struct {
 	UnscopedDelete bool
 }
 
-type GormRepo[T any, ID comparable] struct {
+type GormRepo[T any, ID IDConstraint] struct {
 	db    *gorm.DB
 	cfg   RepoConfig
 	zero  T // zero value для &zero
@@ -56,7 +56,7 @@ type TableNamer interface {
 // idCol — имя PK (обычно "id"). Можно переопределить через опцию.
 type Option func(*GormRepo[struct{}, int])
 
-func NewGormRepo[T any, ID comparable](db *gorm.DB, cfg RepoConfig, opts ...func(*GormRepo[T, ID])) *GormRepo[T, ID] {
+func NewGormRepo[T any, ID IDConstraint](db *gorm.DB, cfg RepoConfig, opts ...func(*GormRepo[T, ID])) *GormRepo[T, ID] {
 	r := &GormRepo[T, ID]{db: db, cfg: cfg, idCol: "id"}
 	// определить имя таблицы (важно для некоторых SQL-конструкций)
 	var tmp any = new(T)

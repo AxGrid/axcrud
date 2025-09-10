@@ -57,6 +57,7 @@ func TestGormRepo_ContextAnsScope(t *testing.T) {
 		Scopes: []func(*gorm.DB) *gorm.DB{
 			func(db *gorm.DB) *gorm.DB {
 				userId := db.Statement.Context.Value("user_id").(uint)
+
 				return db.Where("user_id = ?", userId)
 			}, // ACL/tenant
 		},
@@ -100,10 +101,13 @@ func TestGormRepo_ContextAnsScope(t *testing.T) {
 	}
 
 	// Try delete user2
-	err = repo.Delete(ctx, user2.ID)
-	if err == nil {
-		t.Fatal("expected error when deleting user with different UserID")
+	_ = repo.Delete(inCtx, user2.ID)
+
+	var usersCount int64
+	if err = db.Model(&TestUser{}).Count(&usersCount).Error; err != nil {
+		t.Fatal(err)
 	}
+	assert.Equal(t, int64(2), usersCount) // both users should exist
 
 	//// Cleanup
 	//_, _ = repo.DeleteMany(ctx, []uint{user1.ID, user2.ID})

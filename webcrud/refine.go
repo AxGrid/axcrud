@@ -2,6 +2,8 @@ package webcrud
 
 import (
 	"strings"
+
+	"github.com/axgrid/axcrud"
 )
 
 // ===== Refine inbound =====
@@ -32,37 +34,9 @@ type RefineListRequest struct {
 	Q string `json:"q"`
 }
 
-// ===== Repo inbound (из твоего репо-пакета) =====
-
-type Filter struct {
-	Field    string
-	Operator string
-	Value    any
-}
-
-type Sort struct {
-	Field string
-	Order string // "asc"|"desc"
-}
-
-type Pagination struct {
-	Page    int
-	PerPage int
-}
-
-type ListParams struct {
-	Filters      []Filter
-	Sort         *Sort
-	Search       string
-	SearchFields []string
-	Pagination   Pagination
-}
-
-// ===== Adapter =====
-
-func AdaptRefineList(req RefineListRequest) ListParams {
-	lp := ListParams{
-		Pagination: Pagination{
+func AdaptRefineList(req RefineListRequest) axcrud.ListParams {
+	lp := axcrud.ListParams{
+		Pagination: axcrud.Pagination{
 			Page:    max1(req.Pagination.Current),
 			PerPage: max1(req.Pagination.PageSize),
 		},
@@ -70,7 +44,7 @@ func AdaptRefineList(req RefineListRequest) ListParams {
 
 	// sorters: берём первый (refine обычно шлёт массив; если хочешь — поддержи multi-sort)
 	if len(req.Sorters) > 0 {
-		lp.Sort = &Sort{
+		lp.Sort = &axcrud.Sort{
 			Field: req.Sorters[0].Field,
 			Order: normalizeOrder(req.Sorters[0].Order),
 		}
@@ -78,9 +52,9 @@ func AdaptRefineList(req RefineListRequest) ListParams {
 
 	// filters
 	if len(req.Filters) > 0 {
-		lp.Filters = make([]Filter, 0, len(req.Filters))
+		lp.Filters = make([]axcrud.Filter, 0, len(req.Filters))
 		for _, f := range req.Filters {
-			lp.Filters = append(lp.Filters, Filter{
+			lp.Filters = append(lp.Filters, axcrud.Filter{
 				Field:    f.Field,
 				Operator: strings.ToLower(f.Operator),
 				Value:    f.Value,

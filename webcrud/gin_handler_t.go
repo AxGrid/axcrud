@@ -4,11 +4,12 @@ package webcrud
 import (
 	"net/http"
 
+	"github.com/axgrid/axcrud"
 	"github.com/gin-gonic/gin"
 )
 
 // GET /resource?...
-func GinGetListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
+func GinGetListT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := ParseRefineQuery(c.Request.URL.Query())
 		lp := AdaptRefineList(req)
@@ -30,7 +31,7 @@ func GinGetListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[
 }
 
 // POST /resource/list  (JSON refine-запрос)
-func GinPostListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
+func GinPostListT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in RefineListRequest
 		if err := c.ShouldBindJSON(&in); err != nil {
@@ -56,7 +57,7 @@ func GinPostListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn
 }
 
 // POST /resource  (create)
-func GinCreateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
+func GinCreateT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in T
 		if err := c.ShouldBindJSON(&in); err != nil {
@@ -77,7 +78,7 @@ func GinCreateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T
 }
 
 // GET /resource/:id (one)
-func GinGetOneT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
+func GinGetOneT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parseID[ID](c.Param("id"))
 		if err != nil {
@@ -99,7 +100,7 @@ func GinGetOneT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T
 }
 
 // POST /resource/getMany  { "ids": [...] }  или GET /resource/many?ids[]=...
-func GinGetManyT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
+func GinGetManyT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ids, ok, err := readIDsFromRequest[ID](c)
 		if err != nil {
@@ -128,7 +129,7 @@ func GinGetManyT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[
 }
 
 // PATCH /resource/:id  (patch -> reload -> transform)
-func GinUpdateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
+func GinUpdateT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parseID[ID](c.Param("id"))
 		if err != nil {
@@ -158,7 +159,7 @@ func GinUpdateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T
 }
 
 // DELETE /resource/:id
-func GinDeleteT[T any, ID IDConstraint, DTO any](r Repo[T, ID]) gin.HandlerFunc {
+func GinDeleteT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id, err := parseID[ID](c.Param("id"))
 		if err != nil {
@@ -174,7 +175,7 @@ func GinDeleteT[T any, ID IDConstraint, DTO any](r Repo[T, ID]) gin.HandlerFunc 
 }
 
 // POST /resource/deleteMany {ids:[]}
-func GinDeleteManyT[T any, ID IDConstraint, DTO any](r Repo[T, ID]) gin.HandlerFunc {
+func GinDeleteManyT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in idsReq[ID]
 		if err := c.ShouldBindJSON(&in); err != nil {

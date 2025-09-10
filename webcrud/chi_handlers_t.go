@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/axgrid/axcrud"
 	"github.com/go-chi/chi/v5"
 )
 
 // GET /resource?current=&pageSize=&sorters[...]&filters[...]&q=...
-func ChiGetListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
+func ChiGetListT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		ref := ParseRefineQuery(req.URL.Query())
 		lp := AdaptRefineList(ref)
@@ -30,7 +31,7 @@ func ChiGetListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[
 }
 
 // POST /resource/list  (JSON {pagination, sorters, filters, search/searchFields/q})
-func ChiPostListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
+func ChiPostListT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var in RefineListRequest
 		if err := json.NewDecoder(req.Body).Decode(&in); err != nil {
@@ -56,7 +57,7 @@ func ChiPostListT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn
 }
 
 // POST /resource  (create) — тело: доменная модель T
-func ChiCreateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
+func ChiCreateT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var in T
 		if err := json.NewDecoder(req.Body).Decode(&in); err != nil {
@@ -77,7 +78,7 @@ func ChiCreateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T
 }
 
 // GET /resource/{id}
-func ChiGetOneT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
+func ChiGetOneT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		idStr := chi.URLParam(req, "id")
 		id, err := parseID[ID](idStr)
@@ -103,7 +104,7 @@ func ChiGetOneT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T
 }
 
 // GET /resource/many?ids[]=...  И/ИЛИ  POST /resource/getMany  { "ids": [...] }
-func ChiGetManyT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
+func ChiGetManyT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		ids, ok, err := readIDsChi[ID](req)
 		if err != nil {
@@ -132,7 +133,7 @@ func ChiGetManyT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[
 }
 
 // PATCH /resource/{id}  (тело: map[string]any)
-func ChiUpdateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
+func ChiUpdateT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID], tr TransformFn[T, DTO]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		idStr := chi.URLParam(req, "id")
 		id, err := parseID[ID](idStr)
@@ -164,7 +165,7 @@ func ChiUpdateT[T any, ID IDConstraint, DTO any](r Repo[T, ID], tr TransformFn[T
 }
 
 // DELETE /resource/{id}
-func ChiDeleteT[T any, ID IDConstraint, DTO any](r Repo[T, ID]) http.HandlerFunc {
+func ChiDeleteT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		idStr := chi.URLParam(req, "id")
 		id, err := parseID[ID](idStr)
@@ -182,7 +183,7 @@ func ChiDeleteT[T any, ID IDConstraint, DTO any](r Repo[T, ID]) http.HandlerFunc
 }
 
 // POST /resource/deleteMany  { "ids": [...] }
-func ChiDeleteManyT[T any, ID IDConstraint, DTO any](r Repo[T, ID]) http.HandlerFunc {
+func ChiDeleteManyT[T any, ID IDConstraint, DTO any](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var in idsReq[ID]
 		if err := json.NewDecoder(req.Body).Decode(&in); err != nil {

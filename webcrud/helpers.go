@@ -1,8 +1,11 @@
 package webcrud
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/axgrid/axcrud"
+	"github.com/gin-gonic/gin"
+)
 
-func CreateGinRouter[T any, ID IDConstraint](r *gin.RouterGroup, repo Repo[T, ID]) {
+func CreateGinRouter[T any, ID IDConstraint](r *gin.RouterGroup, repo axcrud.Repo[T, ID]) {
 	r.GET("/users", GinGetList[T, ID](repo))
 	r.POST("/users/list", GinPostList[T, ID](repo))
 	r.POST("/users", GinCreate[T, ID](repo))

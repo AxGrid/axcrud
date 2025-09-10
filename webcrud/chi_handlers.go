@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/axgrid/axcrud"
 	"github.com/go-chi/chi/v5"
 )
 
-func ChiGetList[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
+func ChiGetList[T any, ID IDConstraint](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		rreq := ParseRefineQuery(req.URL.Query())
 		lp := AdaptRefineList(rreq)
@@ -20,7 +21,7 @@ func ChiGetList[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
 	}
 }
 
-func ChiPostList[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
+func ChiPostList[T any, ID IDConstraint](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var in RefineListRequest
 		if err := json.NewDecoder(req.Body).Decode(&in); err != nil {
@@ -37,7 +38,7 @@ func ChiPostList[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
 	}
 }
 
-func ChiCreate[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
+func ChiCreate[T any, ID IDConstraint](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var in T
 		if err := json.NewDecoder(req.Body).Decode(&in); err != nil {
@@ -52,7 +53,7 @@ func ChiCreate[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
 	}
 }
 
-func ChiGetOne[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
+func ChiGetOne[T any, ID IDConstraint](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		idStr := chi.URLParam(req, "id")
 		id, err := parseID[ID](idStr)
@@ -69,7 +70,7 @@ func ChiGetOne[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
 	}
 }
 
-func ChiGetMany[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
+func ChiGetMany[T any, ID IDConstraint](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		if req.Method == http.MethodGet {
 			idsQ := req.URL.Query()["ids[]"]
@@ -115,7 +116,7 @@ func ChiGetMany[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
 	}
 }
 
-func ChiUpdate[T any, ID ~uint | ~uint64 | ~int | ~int64 | ~string](r Repo[T, ID]) http.HandlerFunc {
+func ChiUpdate[T any, ID ~uint | ~uint64 | ~int | ~int64 | ~string](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		idStr := chi.URLParam(req, "id")
 		id, err := parseID[ID](idStr)
@@ -137,7 +138,7 @@ func ChiUpdate[T any, ID ~uint | ~uint64 | ~int | ~int64 | ~string](r Repo[T, ID
 	}
 }
 
-func ChiDelete[T any, ID ~uint | ~uint64 | ~int | ~int64 | ~string](r Repo[T, ID]) http.HandlerFunc {
+func ChiDelete[T any, ID ~uint | ~uint64 | ~int | ~int64 | ~string](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		idStr := chi.URLParam(req, "id")
 		id, err := parseID[ID](idStr)
@@ -153,7 +154,7 @@ func ChiDelete[T any, ID ~uint | ~uint64 | ~int | ~int64 | ~string](r Repo[T, ID
 	}
 }
 
-func ChiDeleteMany[T any, ID IDConstraint](r Repo[T, ID]) http.HandlerFunc {
+func ChiDeleteMany[T any, ID IDConstraint](r axcrud.Repo[T, ID]) http.HandlerFunc {
 	return func(w http.ResponseWriter, req *http.Request) {
 		var in idsReq[ID]
 		if err := json.NewDecoder(req.Body).Decode(&in); err != nil {

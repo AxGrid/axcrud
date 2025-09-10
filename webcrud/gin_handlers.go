@@ -2,9 +2,9 @@
 package webcrud
 
 import (
-	"context"
 	"net/http"
 
+	"github.com/axgrid/axcrud"
 	"github.com/gin-gonic/gin"
 )
 
@@ -18,17 +18,7 @@ import (
 //	DeleteMany(context.Context, []ID) (int64, error)
 //}
 
-type Repo[T any, ID IDConstraint] interface {
-	GetList(ctx context.Context, p ListParams) (items []T, total int64, err error)
-	GetOne(ctx context.Context, id ID) (T, error)
-	Create(ctx context.Context, in *T) error
-	Update(ctx context.Context, id ID, patch map[string]any) (T, error)
-	Delete(ctx context.Context, id ID) error
-	DeleteMany(ctx context.Context, ids []ID) (affected int64, err error)
-	GetMany(context.Context, []ID) ([]T, error)
-}
-
-func GinGetList[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinGetList[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		req := ParseRefineQuery(c.Request.URL.Query())
 		lp := AdaptRefineList(req)
@@ -41,7 +31,7 @@ func GinGetList[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinPostList[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinPostList[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in RefineListRequest
 		if err := c.ShouldBindJSON(&in); err != nil {
@@ -58,7 +48,7 @@ func GinPostList[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinCreate[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinCreate[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in T
 		if err := c.ShouldBindJSON(&in); err != nil {
@@ -73,7 +63,7 @@ func GinCreate[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinGetOne[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinGetOne[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
 		id, err := parseID[ID](idStr)
@@ -90,7 +80,7 @@ func GinGetOne[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinGetMany[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinGetMany[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in idsReq[ID]
 		if err := c.ShouldBindJSON(&in); err != nil {
@@ -129,7 +119,7 @@ func GinGetMany[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinUpdate[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinUpdate[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
 		id, err := parseID[ID](idStr)
@@ -151,7 +141,7 @@ func GinUpdate[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinDelete[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinDelete[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")
 		id, err := parseID[ID](idStr)
@@ -167,7 +157,7 @@ func GinDelete[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
-func GinDeleteMany[T any, ID IDConstraint](r Repo[T, ID]) gin.HandlerFunc {
+func GinDeleteMany[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var in idsReq[ID]
 		if err := c.ShouldBindJSON(&in); err != nil {

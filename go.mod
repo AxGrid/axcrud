@@ -1,4 +1,4 @@
-module axcrud
+module github.com/axgrid/axcrud.git
 
 go 1.24
 

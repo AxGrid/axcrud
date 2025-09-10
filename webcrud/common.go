@@ -1,5 +1,5 @@
 // transport/common.go
-package transport
+package webcrud
 
 import (
 	"encoding/json"

@@ -1,4 +1,4 @@
-package transport
+package webcrud
 
 type ListResponse[T any] struct {
 	Data  []T   `json:"data"`

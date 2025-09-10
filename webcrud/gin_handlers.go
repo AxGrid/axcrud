@@ -1,5 +1,5 @@
 // transport/gin_handlers.go
-package transport
+package webcrud
 
 import (
 	"context"

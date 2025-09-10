@@ -1,5 +1,5 @@
 // transport/response_dto.go
-package transport
+package webcrud
 
 type ListResponseDTO[DTO any] struct {
 	Data  []DTO `json:"data"`

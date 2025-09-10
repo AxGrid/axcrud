@@ -1,5 +1,4 @@
-// transport/chi_handlers.go
-package transport
+package webcrud
 
 import (
 	"encoding/json"

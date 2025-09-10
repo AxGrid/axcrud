@@ -6,13 +6,13 @@ import (
 )
 
 func CreateGinRouter[T any, ID IDConstraint](r *gin.RouterGroup, repo axcrud.Repo[T, ID]) {
-	r.GET("/users", GinGetList[T, ID](repo))
-	r.POST("/users/list", GinPostList[T, ID](repo))
-	r.POST("/users", GinCreate[T, ID](repo))
-	r.GET("/users/:id", GinGetOne[T, ID](repo))
-	r.GET("/users/many", GinGetMany[T, ID](repo))     // GET ids[]=...
-	r.POST("/users/getMany", GinGetMany[T, ID](repo)) // POST {ids:[]}
-	r.PATCH("/users/:id", GinUpdate[T, ID](repo))
-	r.DELETE("/users/:id", GinDelete[T, ID](repo))
-	r.POST("/users/deleteMany", GinDeleteMany[T, ID](repo))
+	r.GET("/", GinGetList[T, ID](repo))
+	r.POST("/list", GinPostList[T, ID](repo))
+	r.POST("/", GinCreate[T, ID](repo))
+	r.GET("/:id", GinGetOne[T, ID](repo))
+	r.GET("/many", GinGetMany[T, ID](repo))     // GET ids[]=...
+	r.POST("/getMany", GinGetMany[T, ID](repo)) // POST {ids:[]}
+	r.PATCH("/:id", GinUpdate[T, ID](repo))
+	r.DELETE("/:id", GinDelete[T, ID](repo))
+	r.POST("/deleteMany", GinDeleteMany[T, ID](repo))
 }

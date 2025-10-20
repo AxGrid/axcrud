@@ -17,6 +17,7 @@ type Repo[T any, ID IDConstraint] interface {
 	Update(ctx context.Context, id ID, patch map[string]any) (T, error)
 	Delete(ctx context.Context, id ID) error
 	DeleteMany(ctx context.Context, ids []ID) (affected int64, err error)
+	Save(ctx context.Context, id ID, obj T) (T, error)
 	// Транзакции опционально
 	WithTx(tx *gorm.DB) Repo[T, ID]
 	GetMany(context.Context, []ID) ([]T, error)

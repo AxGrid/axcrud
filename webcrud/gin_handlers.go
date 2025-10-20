@@ -141,6 +141,27 @@ func GinUpdate[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	}
 }
 
+func GinSave[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		idStr := c.Param("id")
+		id, err := parseID[ID](idStr)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		var in T
+		if err := c.ShouldBindJSON(&in); err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		if _, err := r.Save(c, id, in); err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+			return
+		}
+		c.JSON(http.StatusOK, OneResponse[T]{Data: in})
+	}
+}
+
 func GinDelete[T any, ID IDConstraint](r axcrud.Repo[T, ID]) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		idStr := c.Param("id")

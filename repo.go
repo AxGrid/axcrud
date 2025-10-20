@@ -106,6 +106,16 @@ func (r *GormRepo[T, ID]) Update(ctx context.Context, id ID, patch map[string]an
 	return r.GetOne(ctx, id)
 }
 
+func (r *GormRepo[T, ID]) Save(ctx context.Context, id ID, obj T) (T, error) {
+	var out T
+	q := r.base(ctx)
+	if err := q.Model(&obj).Where(clause.Eq{Column: clause.Column{Name: r.idCol}, Value: id}).
+		Save(obj).Error; err != nil {
+		return out, err
+	}
+	return obj, nil
+}
+
 func (r *GormRepo[T, ID]) Delete(ctx context.Context, id ID) error {
 	q := r.base(ctx)
 	if r.cfg.UnscopedDelete {
